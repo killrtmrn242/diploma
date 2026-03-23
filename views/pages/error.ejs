@@ -1,0 +1,17 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="auth-card text-center">
+        <span class="eyebrow">Error</span>
+        <h1 class="display-5"><%= statusCode %></h1>
+        <p class="section-text"><%= message %></p>
+        <a href="/" class="btn btn-primary">Return to Home</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("../partials/footer") %>

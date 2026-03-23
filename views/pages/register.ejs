@@ -1,0 +1,37 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="auth-card">
+        <span class="eyebrow">Registration</span>
+        <h1 class="section-title">Create a local user account</h1>
+        <p class="section-text">
+          This form creates a MongoDB user with a bcrypt-hashed password. The same account can then be used for both Session-based and JWT authentication.
+        </p>
+
+        <% if (errorMessage && errorMessage.length) { %>
+          <div class="alert alert-danger"><%= errorMessage[0] %></div>
+        <% } %>
+        <% if (successMessage && successMessage.length) { %>
+          <div class="alert alert-success"><%= successMessage[0] %></div>
+        <% } %>
+
+        <form action="/register" method="POST" class="mt-4">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required />
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" minlength="6" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("../partials/footer") %>

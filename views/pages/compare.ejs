@@ -1,0 +1,74 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="container py-5">
+  <section class="mb-5">
+    <span class="eyebrow">Comparative Analysis</span>
+    <h1 class="section-title">Comparison of authentication methods</h1>
+    <p class="section-text" style="max-width: 900px;">
+      The table and theory cards below help explain the architectural differences, advantages, disadvantages, and practical scenarios for Session-based authentication, JWT, and OAuth 2.0.
+    </p>
+  </section>
+
+  <section class="row g-4 mb-5">
+    <% theoryCards.forEach((card) => { %>
+      <div class="col-lg-4">
+        <div class="info-card h-100">
+          <h3><%= card.title %></h3>
+          <p><strong>Theory summary:</strong> <%= card.summary %></p>
+          <p><strong>Advantages:</strong> <%= card.advantages %></p>
+          <p><strong>Disadvantages:</strong> <%= card.disadvantages %></p>
+          <p class="mb-0"><strong>Recommended usage:</strong> <%= card.scenarios %></p>
+        </div>
+      </div>
+    <% }) %>
+  </section>
+
+  <section class="auth-card">
+    <div class="table-responsive">
+      <table class="table comparison-table align-middle">
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th>Session-Based</th>
+            <th>JWT</th>
+            <th>OAuth 2.0</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% comparisonRows.forEach((row) => { %>
+            <tr>
+              <td><strong><%= row.criterion %></strong></td>
+              <td><%= row.session %></td>
+              <td><%= row.jwt %></td>
+              <td><%= row.oauth %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="row g-4 mt-2">
+    <div class="col-md-4">
+      <div class="info-card h-100">
+        <h3>Session stores login state on server</h3>
+        <p class="mb-0">The browser keeps a session cookie, while the server preserves the actual authenticated state.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="info-card h-100">
+        <h3>JWT stores claims in a token</h3>
+        <p class="mb-0">The token contains signed identity data that the server verifies for protected API access.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="info-card h-100">
+        <h3>OAuth delegates authentication</h3>
+        <p class="mb-0">Google authenticates the user externally and the application receives a trusted callback response.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include("../partials/footer") %>

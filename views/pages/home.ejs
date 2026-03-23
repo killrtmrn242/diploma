@@ -1,0 +1,73 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main>
+  <section class="hero-section">
+    <div class="container py-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <span class="eyebrow">Authentication Platform</span>
+          <h1 class="display-4 hero-title">
+            Comparative analysis of authentication methods in web applications
+          </h1>
+          <p class="hero-text">
+            This application combines Session-based authentication, JWT authentication, and OAuth 2.0 in one Express.js project so their architecture, security model, and practical behavior can be explored side by side.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a href="/register" class="btn btn-primary btn-lg">Create Test Account</a>
+            <a href="/login" class="btn btn-outline-light btn-lg">Open Login Page</a>
+            <a href="/compare" class="btn btn-ghost btn-lg">View Comparison</a>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="hero-panel">
+            <div class="status-chip">Demonstration-ready system</div>
+            <div class="mini-card">
+              <h3>Included in the application</h3>
+              <ul class="feature-list">
+                <li>Registration and hashed passwords</li>
+                <li>Session login with Passport Local</li>
+                <li>JWT token login and protected API route</li>
+                <li>Google OAuth 2.0 integration</li>
+              </ul>
+            </div>
+            <div class="mini-card mt-3">
+              <h3>Project focus</h3>
+              <p class="mb-0">
+                Each authentication method is presented separately so the differences between them are clear and easy to understand.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container py-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="info-card">
+          <span class="badge bg-session">Session</span>
+          <h3>Server-side state</h3>
+          <p>The backend stores the authenticated session and the browser holds a cookie with the session identifier.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card">
+          <span class="badge bg-jwt">JWT</span>
+          <h3>Signed token claims</h3>
+          <p>The client receives a signed token and sends it in the Authorization header for protected API access.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card">
+          <span class="badge bg-oauth">OAuth 2.0</span>
+          <h3>External identity provider</h3>
+          <p>Google authenticates the user, while this app receives profile data and creates or links a local account.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include("../partials/footer") %>

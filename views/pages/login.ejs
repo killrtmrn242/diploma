@@ -1,0 +1,74 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="container py-5">
+  <div class="text-center mb-5">
+    <span class="eyebrow">Main Demonstration Page</span>
+    <h1 class="section-title">Compare three login methods in one interface</h1>
+    <p class="section-text mx-auto" style="max-width: 760px;">
+      Each block below corresponds to one authentication strategy implemented in the backend. This makes the practical difference between the methods clear and easy to compare.
+    </p>
+  </div>
+
+  <% if (errorMessage && errorMessage.length) { %>
+    <div class="alert alert-danger"><%= errorMessage[0] %></div>
+  <% } %>
+  <% if (successMessage && successMessage.length) { %>
+    <div class="alert alert-success"><%= successMessage[0] %></div>
+  <% } %>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="auth-card auth-method-card">
+        <span class="badge bg-session">Session</span>
+        <h2>Session-Based Login</h2>
+        <p>Passport Local verifies credentials and the server creates a session stored on the backend.</p>
+        <form action="/login-session" method="POST" class="mt-4">
+          <div class="mb-3">
+            <label class="form-label" for="session-email">Email</label>
+            <input type="email" class="form-control" id="session-email" name="email" required />
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="session-password">Password</label>
+            <input type="password" class="form-control" id="session-password" name="password" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login with Session</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="auth-card auth-method-card">
+        <span class="badge bg-jwt">JWT</span>
+        <h2>JWT Login</h2>
+        <p>The server returns a signed token. The browser stores it in localStorage for demonstration of API requests.</p>
+        <form id="jwtLoginForm" class="mt-4">
+          <div class="mb-3">
+            <label class="form-label" for="jwt-email">Email</label>
+            <input type="email" class="form-control" id="jwt-email" name="email" required />
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="jwt-password">Password</label>
+            <input type="password" class="form-control" id="jwt-password" name="password" required />
+          </div>
+          <button type="submit" class="btn btn-dark w-100">Login with JWT</button>
+        </form>
+        <div id="jwtResponseBox" class="token-box d-none mt-4"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="auth-card auth-method-card">
+        <span class="badge bg-oauth">OAuth 2.0</span>
+        <h2>OAuth 2.0 Login</h2>
+        <p>The user is redirected to Google, signs in there, and then returns to the application with verified profile data.</p>
+        <a href="/auth/google" class="btn btn-google w-100 mt-4">Login with Google</a>
+        <p class="small-note mt-3 mb-0">
+          Before using this method, configure Google OAuth values inside the environment file.
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include("../partials/footer") %>

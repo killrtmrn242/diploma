@@ -1,0 +1,100 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="container py-5">
+  <section class="dashboard-hero">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-8">
+        <span class="eyebrow">Protected Resource</span>
+        <h1 class="section-title">Dashboard</h1>
+        <p class="section-text">
+          This page is available only after successful authentication. It highlights which method granted access and explains its operating principle.
+        </p>
+      </div>
+      <div class="col-lg-4">
+        <div class="status-card">
+          <div class="status-label">Current status</div>
+          <div class="status-value">Authenticated</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <% if (successMessage && successMessage.length) { %>
+    <div class="alert alert-success mt-4"><%= successMessage[0] %></div>
+  <% } %>
+
+  <section class="row g-4 mt-1">
+    <div class="col-lg-8">
+      <div class="auth-card">
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+          <% if (authMethod === "session") { %>
+            <span class="badge bg-session">Session</span>
+            <span class="badge auth-badge">Logged in using Session-based Authentication</span>
+          <% } else if (authMethod === "jwt") { %>
+            <span class="badge bg-jwt">JWT</span>
+            <span class="badge auth-badge">Logged in using JWT Authentication</span>
+          <% } else { %>
+            <span class="badge bg-oauth">OAuth 2.0</span>
+            <span class="badge auth-badge">Logged in using OAuth 2.0 Authentication</span>
+          <% } %>
+        </div>
+
+        <h2 class="mb-3">User overview</h2>
+        <div class="info-grid">
+          <div>
+            <span class="info-label">Email</span>
+            <div class="info-value"><%= user.email %></div>
+          </div>
+          <div>
+            <span class="info-label">Authentication method</span>
+            <div class="info-value text-capitalize"><%= authMethod %></div>
+          </div>
+          <div>
+            <span class="info-label">Available methods for this account</span>
+            <div class="info-value"><%= user.authMethods.join(", ") %></div>
+          </div>
+          <div>
+            <span class="info-label">OAuth provider</span>
+            <div class="info-value"><%= user.oauthProvider || "Not linked" %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="auth-card h-100">
+        <h2 class="mb-3">How it works</h2>
+        <p><%= explanation %></p>
+        <% if (authMethod === "jwt") { %>
+          <div class="token-box mt-4">
+            <div class="token-label">Current token preview</div>
+            <code id="dashboardTokenPreview"><%= tokenPreview %></code>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <% if (authMethod === "jwt") { %>
+    <section class="auth-card mt-4">
+      <h2 class="mb-3">JWT protected API demonstration</h2>
+      <p class="section-text">
+        The block below is populated by calling <code>/api/jwt-profile</code> with the bearer token stored in browser localStorage.
+      </p>
+      <pre id="jwtApiProfile" class="token-box mb-0">Loading JWT API profile...</pre>
+    </section>
+  <% } %>
+
+  <section class="auth-card mt-4">
+    <div class="d-flex flex-wrap gap-3">
+      <a href="<%= profileLink %>" class="btn btn-primary">Open Profile</a>
+      <a href="/compare" class="btn btn-outline-dark">Open Comparison Page</a>
+      <form action="/logout" method="POST">
+        <button type="submit" class="btn btn-danger">Logout</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<%- include("../partials/footer") %>
