@@ -126,6 +126,13 @@ exports.loginJWT = async (req, res, next) => {
       }
     );
 
+    res.cookie("jwtAuthToken", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 1000 * 60 * 60
+    });
+
     return res.json({
       success: true,
       message: "JWT authentication successful.",
@@ -154,6 +161,7 @@ exports.logout = (req, res, next) => {
       }
 
       res.clearCookie("connect.sid");
+      res.clearCookie("jwtAuthToken");
       return res.redirect("/login");
     });
   });

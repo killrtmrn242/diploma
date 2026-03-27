@@ -2,6 +2,28 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 
+function parseCookies(cookieHeader = "") {
+  return cookieHeader.split(";").reduce((cookies, part) => {
+    const [rawName, ...rest] = part.trim().split("=");
+
+    if (!rawName) {
+      return cookies;
+    }
+
+    cookies[rawName] = decodeURIComponent(rest.join("=") || "");
+    return cookies;
+  }, {});
+}
+
+function getJWTToken(req) {
+  if (req.query.token) {
+    return req.query.token;
+  }
+
+  const cookies = parseCookies(req.headers.cookie || "");
+  return cookies.jwtAuthToken || "";
+}
+
 function buildDashboardDescription(method) {
   const descriptions = {
     session:
@@ -16,7 +38,7 @@ function buildDashboardDescription(method) {
 }
 
 function getMethodFromRequest(req) {
-  if (req.query.method === "jwt") {
+  if (req.query.method === "jwt" || getJWTToken(req)) {
     return "jwt";
   }
 
@@ -56,7 +78,7 @@ exports.dashboardPage = async (req, res, next) => {
     let tokenPreview = "";
 
     if (authMethod === "jwt") {
-      const token = req.query.token || "";
+      const token = getJWTToken(req);
       if (!token) {
         req.flash("error", "JWT demonstration requires a valid token from the login form.");
         return res.redirect("/login");
@@ -79,8 +101,8 @@ exports.dashboardPage = async (req, res, next) => {
       explanation: buildDashboardDescription(authMethod),
       tokenPreview,
       profileLink:
-        authMethod === "jwt" && req.query.token
-          ? `/profile?method=jwt&token=${encodeURIComponent(req.query.token)}`
+        authMethod === "jwt" && getJWTToken(req)
+          ? `/profile?method=jwt`
           : "/profile"
     });
   } catch (error) {
@@ -94,7 +116,7 @@ exports.profilePage = async (req, res) => {
   let user = req.user || null;
 
   if (authMethod === "jwt") {
-    const token = req.query.token || "";
+    const token = getJWTToken(req);
 
     if (!token) {
       req.flash("error", "JWT profile view requires the token generated during JWT login.");

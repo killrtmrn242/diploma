@@ -104,6 +104,13 @@ h3,
 .hero-panel {
   position: relative;
   overflow: hidden;
+  color: var(--text);
+}
+
+.hero-panel h3,
+.hero-panel p,
+.hero-panel li {
+  color: var(--text);
 }
 
 .status-chip {

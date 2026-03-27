@@ -6,6 +6,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const methodOverride = require("method-override");
+const jwt = require("jsonwebtoken");
 
 const connectDB = require("./config/db");
 const configurePassport = require("./config/passport");
@@ -15,6 +16,19 @@ const apiRoutes = require("./routes/apiRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+function parseCookies(cookieHeader = "") {
+  return cookieHeader.split(";").reduce((cookies, part) => {
+    const [rawName, ...rest] = part.trim().split("=");
+
+    if (!rawName) {
+      return cookies;
+    }
+
+    cookies[rawName] = decodeURIComponent(rest.join("=") || "");
+    return cookies;
+  }, {});
+}
 
 connectDB();
 configurePassport(passport);
@@ -46,8 +60,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
+  const cookies = parseCookies(req.headers.cookie || "");
+  const jwtToken = cookies.jwtAuthToken || "";
+  let hasValidJWT = false;
+
+  if (jwtToken) {
+    try {
+      jwt.verify(jwtToken, process.env.JWT_SECRET || "fallback_jwt_secret");
+      hasValidJWT = true;
+    } catch (error) {
+      hasValidJWT = false;
+    }
+  }
+
   res.locals.currentUser = req.user || null;
-  res.locals.isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
+  res.locals.isAuthenticated = (req.isAuthenticated ? req.isAuthenticated() : false) || hasValidJWT;
+  res.locals.hasJWTSession = hasValidJWT;
   res.locals.successMessage = req.flash("success");
   res.locals.errorMessage = req.flash("error");
   res.locals.infoMessage = req.flash("info");
