@@ -1,6 +1,9 @@
+const fs = require("fs");
+const path = require("path");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { getMetrics, summarizeMetrics } = require("../services/metricsStore");
 
 function parseCookies(cookieHeader = "") {
   return cookieHeader.split(";").reduce((cookies, part) => {
@@ -230,5 +233,132 @@ exports.comparePage = (req, res) => {
     title: "Compare Methods",
     comparisonRows,
     theoryCards
+  });
+};
+
+exports.securityTestsPage = (req, res) => {
+  res.render("pages/security-tests", {
+    title: "Security Tests"
+  });
+};
+
+exports.securityTestResults = (req, res) => {
+  const resultsPath = path.join(__dirname, "..", "selenium-security-results.json");
+
+  fs.readFile(resultsPath, "utf8", (error, content) => {
+    if (error) {
+      return res.status(404).json({
+        success: false,
+        message: "No Selenium security results file found. Run npm run test:selenium first."
+      });
+    }
+
+    try {
+      return res.json({
+        success: true,
+        report: JSON.parse(content)
+      });
+    } catch (parseError) {
+      return res.status(500).json({
+        success: false,
+        message: "Selenium security results file could not be parsed."
+      });
+    }
+  });
+};
+
+function findMetric(summary, method, type) {
+  return summary.find((item) => item.method === method && item.type === type) || null;
+}
+
+function formatValue(value, fallback = "No data") {
+  return value === undefined || value === null || value === 0 ? fallback : value;
+}
+
+exports.metricsDashboardPage = (req, res) => {
+  const metrics = getMetrics();
+  const summary = summarizeMetrics(metrics);
+  const sessionProtected = findMetric(summary, "session", "protected");
+  const jwtProtected = findMetric(summary, "jwt", "protected");
+  const oauthLogin = findMetric(summary, "oauth", "login");
+  const sessionLogin = findMetric(summary, "session", "login");
+  const jwtLogin = findMetric(summary, "jwt", "login");
+
+  const comparisonTable = [
+    {
+      method: "Session protected route",
+      route: "/dashboard with cookie",
+      avgResponseTime: sessionProtected ? `${sessionProtected.avgResponseTime} ms` : "No data",
+      dbQueries: sessionProtected ? sessionProtected.avgDbQueries : "No data",
+      storage: "Server",
+      scalability: "Low"
+    },
+    {
+      method: "JWT protected route",
+      route: "/api/profile with Bearer token",
+      avgResponseTime: jwtProtected ? `${jwtProtected.avgResponseTime} ms` : "No data",
+      dbQueries: jwtProtected ? jwtProtected.avgDbQueries : "No data",
+      storage: "Client",
+      scalability: "High"
+    },
+    {
+      method: "OAuth login flow",
+      route: "Google login/callback flow only",
+      avgResponseTime: oauthLogin ? `${oauthLogin.avgResponseTime} ms` : "Run Google login",
+      dbQueries: oauthLogin ? oauthLogin.avgDbQueries : "Run Google login",
+      storage: "External provider + local session after callback",
+      scalability: "Medium"
+    }
+  ];
+
+  const cards = [
+    {
+      label: "Session Protected Avg",
+      value: sessionProtected ? `${sessionProtected.avgResponseTime} ms` : "No data",
+      hint: "Measured on /dashboard",
+      className: "metric-session"
+    },
+    {
+      label: "JWT Protected Avg",
+      value: jwtProtected ? `${jwtProtected.avgResponseTime} ms` : "No data",
+      hint: "Measured on /api/profile",
+      className: "metric-jwt"
+    },
+    {
+      label: "JWT Token Size",
+      value: jwtLogin && jwtLogin.avgTokenSize ? `${jwtLogin.avgTokenSize} bytes` : "No data",
+      hint: "Average generated token length",
+      className: "metric-token"
+    },
+    {
+      label: "Total Measurements",
+      value: metrics.length,
+      hint: "Stored in memory",
+      className: "metric-total"
+    }
+  ];
+
+  const requestOverhead = {
+    sessionCookie: sessionProtected ? `${formatValue(sessionProtected.avgCookieSize)} bytes` : "No data",
+    jwtAuthorization: jwtProtected ? `${formatValue(jwtProtected.avgAuthorizationHeaderSize)} bytes` : "No data"
+  };
+  const cookies = parseCookies(req.headers.cookie || "");
+  const hasSessionCookie = Boolean(cookies["connect.sid"]);
+  const hasJWTCookie = Boolean(cookies.jwtAuthToken);
+  const mixedServerState = Boolean(hasSessionCookie && hasJWTCookie);
+
+  res.render("pages/metrics", {
+    title: "Metrics",
+    cards,
+    comparisonTable,
+    summary,
+    metrics: metrics.slice(-12).reverse(),
+    requestOverhead,
+    sessionLogin,
+    jwtLogin,
+    oauthLogin,
+    mixedServerState,
+    hasSessionCookie,
+    hasJWTCookie
   });
 };

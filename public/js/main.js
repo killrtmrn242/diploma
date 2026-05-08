@@ -28,6 +28,8 @@ async function handleJWTLogin(event) {
     localStorage.setItem("jwtToken", result.token);
     localStorage.setItem("jwtUserEmail", result.user.email);
 
+    await runJWTProtectedRequest(result.token);
+
     responseBox.classList.remove("d-none");
     responseBox.innerHTML = `
       <div class="token-label">JWT token generated</div>
@@ -71,6 +73,22 @@ async function fetchJWTProfile() {
   }
 }
 
+async function runJWTProtectedRequest(token) {
+  const response = await fetch("/api/profile", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Unable to run JWT protected request.");
+  }
+
+  return result;
+}
+
 function hydrateDashboardToken() {
   const preview = document.getElementById("dashboardTokenPreview");
   if (!preview) {
@@ -93,6 +111,56 @@ function setupLogoutCleanup() {
   });
 }
 
+async function getAuthState() {
+  try {
+    const response = await fetch("/auth/state");
+    const state = await response.json();
+
+    return {
+      hasSession: Boolean(state.hasSession),
+      hasJwt: Boolean(localStorage.getItem("jwtToken"))
+    };
+  } catch (error) {
+    const metricsPage = document.querySelector(".metrics-page");
+
+    return {
+      hasSession: metricsPage ? metricsPage.dataset.hasSessionAuth === "true" : false,
+      hasJwt: Boolean(localStorage.getItem("jwtToken"))
+    };
+  }
+}
+
+async function showMixedAuthWarningIfNeeded() {
+  const metricsPage = document.querySelector(".metrics-page");
+  const warning = document.getElementById("mixedAuthWarning");
+  const sessionIndicator = document.getElementById("sessionStateIndicator");
+  const jwtIndicator = document.getElementById("jwtStateIndicator");
+  const mixedIndicator = document.getElementById("mixedStateIndicator");
+
+  if (!metricsPage || !warning) {
+    return;
+  }
+
+  const state = await getAuthState();
+  const hasMixedState = state.hasSession === true && state.hasJwt === true;
+
+  if (sessionIndicator) {
+    sessionIndicator.textContent = state.hasSession ? "yes" : "no";
+  }
+
+  if (jwtIndicator) {
+    jwtIndicator.textContent = state.hasJwt ? "yes" : "no";
+  }
+
+  if (mixedIndicator) {
+    mixedIndicator.textContent = hasMixedState ? "yes" : "no";
+  }
+
+  if (hasMixedState) {
+    warning.classList.remove("d-none");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const jwtLoginForm = document.getElementById("jwtLoginForm");
   if (jwtLoginForm) {
@@ -102,4 +170,5 @@ document.addEventListener("DOMContentLoaded", () => {
   hydrateDashboardToken();
   fetchJWTProfile();
   setupLogoutCleanup();
+  showMixedAuthWarningIfNeeded();
 });

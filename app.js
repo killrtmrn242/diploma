@@ -13,6 +13,8 @@ const configurePassport = require("./config/passport");
 const pageRoutes = require("./routes/pageRoutes");
 const authRoutes = require("./routes/authRoutes");
 const apiRoutes = require("./routes/apiRoutes");
+const metricsRoutes = require("./routes/metricsRoutes");
+const metricsMiddleware = require("./middleware/metricsMiddleware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,6 +43,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/selenium-results", express.static(path.join(__dirname, "selenium-results")));
+app.use(metricsMiddleware);
 
 app.use(
   session({
@@ -74,7 +78,8 @@ app.use((req, res, next) => {
   }
 
   res.locals.currentUser = req.user || null;
-  res.locals.isAuthenticated = (req.isAuthenticated ? req.isAuthenticated() : false) || hasValidJWT;
+  res.locals.hasSessionAuth = req.isAuthenticated ? req.isAuthenticated() : false;
+  res.locals.isAuthenticated = res.locals.hasSessionAuth || hasValidJWT;
   res.locals.hasJWTSession = hasValidJWT;
   res.locals.successMessage = req.flash("success");
   res.locals.errorMessage = req.flash("error");
@@ -85,6 +90,7 @@ app.use((req, res, next) => {
 app.use("/", pageRoutes);
 app.use("/", authRoutes);
 app.use("/api", apiRoutes);
+app.use("/", metricsRoutes);
 
 app.use((req, res) => {
   res.status(404).render("pages/error", {

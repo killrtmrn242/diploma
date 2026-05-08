@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { setMetricData } = require("../services/metricsStore");
 
 function sanitizeEmail(email) {
   return String(email || "").toLowerCase().trim();
@@ -11,6 +12,45 @@ function addAuthMethod(user, method) {
   if (!user.authMethods.includes(method)) {
     user.authMethods.push(method);
   }
+}
+
+const sessionCookieOptions = {
+  path: "/",
+  httpOnly: true,
+  secure: false
+};
+
+function destroySession(req, res, next, options = {}) {
+  const { clearJWT = false, redirectTo = null } = options;
+
+  req.logout((logoutError) => {
+    if (logoutError) {
+      return next(logoutError);
+    }
+
+    return req.session.destroy((sessionError) => {
+      if (sessionError) {
+        return next(sessionError);
+      }
+
+      res.clearCookie("connect.sid", sessionCookieOptions);
+
+      if (clearJWT) {
+        res.clearCookie("jwtAuthToken", {
+          path: "/"
+        });
+      }
+
+      if (redirectTo) {
+        return res.redirect(redirectTo);
+      }
+
+      return res.json({
+        success: true,
+        message: "Session destroyed and session cookie cleared."
+      });
+    });
+  });
 }
 
 exports.register = async (req, res, next) => {
@@ -132,6 +172,9 @@ exports.loginJWT = async (req, res, next) => {
       secure: false,
       maxAge: 1000 * 60 * 60
     });
+    setMetricData({
+      tokenSize: Buffer.byteLength(token, "utf8")
+    });
 
     return res.json({
       success: true,
@@ -150,20 +193,32 @@ exports.loginJWT = async (req, res, next) => {
 };
 
 exports.logout = (req, res, next) => {
-  req.logout((logoutError) => {
-    if (logoutError) {
-      return next(logoutError);
-    }
+  return destroySession(req, res, next, {
+    clearJWT: true,
+    redirectTo: "/login"
+  });
+};
 
-    return req.session.destroy((sessionError) => {
-      if (sessionError) {
-        return next(sessionError);
-      }
+exports.logoutSession = (req, res, next) => {
+  return destroySession(req, res, next, {
+    clearJWT: false
+  });
+};
 
-      res.clearCookie("connect.sid");
-      res.clearCookie("jwtAuthToken");
-      return res.redirect("/login");
-    });
+exports.clearJWT = (req, res) => {
+  res.clearCookie("jwtAuthToken", {
+    path: "/"
+  });
+  res.json({
+    success: true,
+    message: "JWT cookie cleared."
+  });
+};
+
+exports.authState = (req, res) => {
+  res.json({
+    hasSession: Boolean(req.isAuthenticated && req.isAuthenticated()),
+    hasJwt: false
   });
 };
 

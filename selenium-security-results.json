@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-05-08T13:00:42.451Z",
+  "baseUrl": "http://localhost:3000",
+  "executionMode": "headless",
+  "chromeMode": "headless",
+  "testUser": "security-attack-demo@example.com",
+  "screenshotsDir": null,
+  "demoScreenshots": [],
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "results": [
+    {
+      "method": "Session",
+      "testName": "Open /dashboard without login",
+      "expected": "Redirect to /login or access denied",
+      "actual": "http://localhost:3000/login",
+      "status": "PASS",
+      "explanation": "The protected dashboard did not open for an unauthenticated request.",
+      "timestamp": "2026-05-08T13:00:39.758Z"
+    },
+    {
+      "method": "Session",
+      "testName": "Login with valid session credentials",
+      "expected": "Dashboard opens",
+      "actual": "http://localhost:3000/dashboard",
+      "status": "PASS",
+      "explanation": "Valid session credentials created a server-side login session.",
+      "timestamp": "2026-05-08T13:00:40.097Z"
+    },
+    {
+      "method": "Session",
+      "testName": "Delete session cookie and reopen /dashboard",
+      "expected": "Redirect to /login or access denied",
+      "actual": "http://localhost:3000/login",
+      "status": "PASS",
+      "explanation": "The protected dashboard did not open for an unauthenticated request.",
+      "timestamp": "2026-05-08T13:00:40.138Z"
+    },
+    {
+      "method": "Session",
+      "testName": "Logout session and verify /dashboard is protected again",
+      "expected": "Redirect to /login or access denied",
+      "actual": "http://localhost:3000/login",
+      "status": "PASS",
+      "explanation": "The protected dashboard did not open for an unauthenticated request.",
+      "timestamp": "2026-05-08T13:00:40.490Z"
+    },
+    {
+      "method": "JWT",
+      "testName": "Call /api/profile without Authorization header",
+      "expected": "HTTP 401 Unauthorized",
+      "actual": "HTTP 401",
+      "status": "PASS",
+      "explanation": "The stateless JWT API rejected a request without a bearer token.",
+      "timestamp": "2026-05-08T13:00:40.565Z"
+    },
+    {
+      "method": "JWT",
+      "testName": "Login through JWT form",
+      "expected": "JWT token exists in localStorage",
+      "actual": "token length 259",
+      "status": "PASS",
+      "explanation": "The JWT login form stored the signed token under localStorage jwtToken.",
+      "timestamp": "2026-05-08T13:00:40.954Z"
+    },
+    {
+      "method": "JWT",
+      "testName": "Call /api/profile with valid Bearer token",
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "status": "PASS",
+      "explanation": "The API accepted the valid JWT bearer token.",
+      "timestamp": "2026-05-08T13:00:40.967Z"
+    },
+    {
+      "method": "JWT",
+      "testName": "Replace token with fake.fake.fake and call /api/profile",
+      "expected": "HTTP 401 Unauthorized",
+      "actual": "HTTP 401",
+      "status": "PASS",
+      "explanation": "The JWT middleware rejected the forged token.",
+      "timestamp": "2026-05-08T13:00:40.988Z"
+    },
+    {
+      "method": "JWT",
+      "testName": "Clear token from localStorage and call /api/profile",
+      "expected": "HTTP 401 Unauthorized",
+      "actual": "HTTP 401",
+      "status": "PASS",
+      "explanation": "The API rejected the request after the bearer token was removed.",
+      "timestamp": "2026-05-08T13:00:41.005Z"
+    },
+    {
+      "method": "OAuth 2.0",
+      "testName": "Open /auth/google/callback without code",
+      "expected": "Redirect or authentication error",
+      "actual": "https://accounts.google.com/signin/oauth/error?authError=Cg9pbnZhbGlkX3JlcXVlc3QSIU1pc3NpbmcgcmVxdWlyZWQgcGFyYW1ldGVyOiBzY29wZRo3aHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaWRlbnRpdHkvcHJvdG9jb2xzL29hdXRoMiCQAw&flowName=GeneralOAuthLite&client_id=681501138743-f81ks2b295gtulq9hel0opgti9ocjpvi.apps.googleusercontent.com&aes=Z9bZLPCJdFMi43Q-HkAP7w&ffgf=1&dsh=S-1624568039:1778245241174044",
+      "status": "PASS",
+      "explanation": "The callback did not create an authenticated dashboard session without a provider code.",
+      "timestamp": "2026-05-08T13:00:42.014Z"
+    },
+    {
+      "method": "OAuth 2.0",
+      "testName": "Open /auth/google/callback?code=fake_test_code",
+      "expected": "Authentication failure",
+      "actual": "http://localhost:3000/auth/google/callback?code=fake_test_code",
+      "status": "PASS",
+      "explanation": "The callback did not authenticate a deliberately fake provider code. Real Google login is intentionally not automated.",
+      "timestamp": "2026-05-08T13:00:42.411Z"
+    },
+    {
+      "method": "OAuth 2.0",
+      "testName": "If OAuth session exists, logout and verify /dashboard is protected",
+      "expected": "No dashboard access remains after logout",
+      "actual": "No existing OAuth session detected",
+      "status": "PASS",
+      "explanation": "The simulation did not automate real Google login, and no OAuth-created local session was present.",
+      "timestamp": "2026-05-08T13:00:42.451Z"
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main
+  class="metrics-page"
+  data-has-session-auth="<%= hasSessionCookie ? 'true' : 'false' %>"
+>
+  <section class="metrics-top">
+    <div class="container py-5">
+      <div class="row align-items-end g-4">
+        <div class="col-lg-8">
+          <span class="eyebrow">Performance Analytics</span>
+          <h1 class="section-title">Authentication Metrics Dashboard</h1>
+          <p class="metrics-lead">
+            Response time, database queries, token size, and request overhead are collected from real application requests and summarized for method comparison.
+          </p>
+        </div>
+        <div class="col-lg-4">
+          <div class="metrics-actions">
+            <a class="btn btn-primary" href="/login">Generate Login Data</a>
+            <a class="btn btn-outline-dark" href="/security-tests">Security Validation</a>
+            <a class="btn btn-outline-dark" href="/metrics/summary" target="_blank">Open JSON Summary</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pt-4">
+    <div
+      id="mixedAuthWarning"
+      class="metrics-warning <%= mixedServerState ? '' : 'd-none' %>"
+    >
+      Mixed authentication state detected. For clean benchmarking and security validation, use the Selenium-based automated security tests from a fresh browser state.
+    </div>
+    <div class="metrics-state-grid mt-3">
+      <div class="metrics-state-item">
+        <span>Session cookie detected</span>
+        <strong id="sessionStateIndicator"><%= hasSessionCookie ? "yes" : "no" %></strong>
+      </div>
+      <div class="metrics-state-item">
+        <span>JWT token detected</span>
+        <strong id="jwtStateIndicator"><%= hasJWTCookie ? "yes" : "no" %></strong>
+      </div>
+      <div class="metrics-state-item">
+        <span>Mixed state</span>
+        <strong id="mixedStateIndicator"><%= mixedServerState ? "yes" : "no" %></strong>
+      </div>
+    </div>
+    <div class="metrics-info-panel mt-3">
+      <strong>Selenium-based automated security validation is the primary testing mechanism.</strong>
+      <span>
+        Use <code>npm run test:selenium</code> for headless validation or <code>npm run test:selenium:demo</code> for the visible diploma defense demonstration.
+      </span>
+    </div>
+  </section>
+
+  <section class="container py-4">
+    <div class="row g-3">
+      <% cards.forEach((card) => { %>
+        <div class="col-md-6 col-xl-3">
+          <div class="metric-card <%= card.className %>">
+            <span><%= card.label %></span>
+            <strong><%= card.value %></strong>
+            <small><%= card.hint %></small>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <section class="container py-4">
+    <div class="metrics-panel">
+      <div class="metrics-section-title">
+        <div>
+          <span class="eyebrow">Final Table</span>
+          <h2>Authentication Method Comparison</h2>
+        </div>
+        <p>OAuth metrics measure the Google redirect/callback login flow. After successful OAuth authentication, the prototype establishes a local session, so subsequent dashboard access is measured as session-based.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="table metrics-table align-middle">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Measured Route</th>
+              <th>Avg Response Time</th>
+              <th>DB Queries</th>
+              <th>Storage</th>
+              <th>Scalability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% comparisonTable.forEach((row) => { %>
+              <tr>
+                <td><strong><%= row.method %></strong></td>
+                <td><%= row.route %></td>
+                <td><%= row.avgResponseTime %></td>
+                <td><%= row.dbQueries %></td>
+                <td><%= row.storage %></td>
+                <td><%= row.scalability %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="container py-4">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="metrics-panel h-100">
+          <div class="metrics-section-title compact">
+            <div>
+              <span class="eyebrow">Overhead</span>
+              <h2>Request Size Comparison</h2>
+            </div>
+          </div>
+          <div class="overhead-row">
+            <span>Session cookie overhead</span>
+            <strong><%= requestOverhead.sessionCookie %></strong>
+          </div>
+          <div class="overhead-row">
+            <span>JWT Authorization header</span>
+            <strong><%= requestOverhead.jwtAuthorization %></strong>
+          </div>
+          <div class="overhead-note">
+            Session requests carry cookie state, while JWT API requests carry a bearer token in the Authorization header.
+          </div>
+          <div class="overhead-note">
+            OAuth login creates a local session after callback; therefore later dashboard access is measured as session-based protected access.
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="metrics-panel h-100">
+          <div class="metrics-section-title compact">
+            <div>
+              <span class="eyebrow">Thesis Text</span>
+              <h2>Short Academic Explanation</h2>
+            </div>
+          </div>
+          <p class="academic-text">
+            The collected metrics demonstrate that authentication methods differ not only in security design, but also in runtime behavior. Session-based authentication depends on server-side state and may require database access when restoring the user session. JWT authentication can validate protected API access using a signed token, reducing database queries after login. OAuth 2.0 adds an external provider to the flow, so its timing depends on redirect and callback processing. Therefore, sessions are suitable for classic web applications, JWT is more scalable for API-oriented systems, and OAuth improves usability through delegated identity management.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container py-4 pb-5">
+    <div class="metrics-panel">
+      <div class="metrics-section-title">
+        <div>
+          <span class="eyebrow">Raw Data</span>
+          <h2>Latest Measurements</h2>
+        </div>
+        <p>Showing the latest 12 measured requests from the in-memory metrics store.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="table metrics-table align-middle">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Auth Source</th>
+              <th>Type</th>
+              <th>Measured Route</th>
+              <th>Response Time</th>
+              <th>DB Queries</th>
+              <th>Token Size</th>
+              <th>Cookie</th>
+              <th>Authorization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (metrics.length === 0) { %>
+              <tr>
+                <td colspan="9" class="text-center text-muted py-4">No metrics yet. Run authentication flows, execute <code>npm run metrics:test</code>, or run Selenium-based automated security validation.</td>
+              </tr>
+            <% } %>
+            <% metrics.forEach((item) => { %>
+              <tr>
+                <td><span class="metric-badge metric-badge-<%= item.method %>"><%= item.method %></span></td>
+                <td><%= item.authSource %></td>
+                <td><%= item.type %></td>
+                <td>
+                  <%= item.measuredRoute || "Legacy metric" %>
+                  <% if (item.method === "oauth" && item.type === "login") { %>
+                    <span class="raw-note">OAuth callback creates local session</span>
+                  <% } %>
+                </td>
+                <td><%= item.responseTime %> ms</td>
+                <td><%= item.dbQueries %></td>
+                <td><%= item.tokenSize || 0 %> bytes</td>
+                <td><%= item.cookieSize || 0 %> bytes</td>
+                <td><%= item.authorizationBytes || item.authorizationHeaderSize || 0 %> bytes</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include("../partials/footer") %>

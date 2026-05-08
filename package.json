@@ -5,7 +5,11 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "metrics:test": "node scripts/authMetricsTest.js",
+    "test:security": "node tests/securityNegativeTests.js",
+    "test:selenium": "node tests/seleniumAttackSimulationTests.js --mode=headless",
+    "test:selenium:demo": "node tests/seleniumAttackSimulationTests.js --mode=demo"
   },
   "keywords": [
     "authentication",
@@ -32,6 +36,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "selenium-webdriver": "^4.27.0"
   }
 }

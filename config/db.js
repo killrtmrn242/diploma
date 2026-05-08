@@ -1,4 +1,17 @@
 const mongoose = require("mongoose");
+const { incrementDbQueries } = require("../services/metricsStore");
+
+mongoose.plugin((schema) => {
+  schema.pre(/^find/, function countFindQuery(next) {
+    incrementDbQueries();
+    next();
+  });
+
+  schema.pre("save", function countSaveQuery(next) {
+    incrementDbQueries();
+    next();
+  });
+});
 
 async function connectDB() {
   try {

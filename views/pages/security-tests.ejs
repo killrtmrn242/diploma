@@ -1,0 +1,243 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="security-tests-page">
+  <section class="security-tests-top">
+    <div class="container py-5">
+      <div class="row align-items-end g-4">
+        <div class="col-lg-8">
+          <span class="eyebrow">Automated Validation</span>
+          <h1 class="section-title">Selenium Security Testing Dashboard</h1>
+          <p class="security-lead">
+            This page displays Selenium-based automated security validation results for session-based authentication, JWT authentication, and OAuth 2.0 callback handling.
+          </p>
+        </div>
+        <div class="col-lg-4">
+          <div class="security-command-panel">
+            <span>Headless mode</span>
+            <code>npm run test:selenium</code>
+            <span>Visible demo mode</span>
+            <code>npm run test:selenium:demo</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container py-4">
+    <div class="row g-3" id="securitySummary">
+      <div class="col-md-6 col-xl-3">
+        <div class="security-summary-card total">
+          <span>Total tests</span>
+          <strong id="summaryTotal">0</strong>
+          <small>From Selenium report</small>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="security-summary-card passed">
+          <span>Passed</span>
+          <strong id="summaryPassed">0</strong>
+          <small>Expected protection confirmed</small>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="security-summary-card failed">
+          <span>Failed</span>
+          <strong id="summaryFailed">0</strong>
+          <small>Needs attention</small>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="security-summary-card warning">
+          <span>Mode</span>
+          <strong id="summaryMode">-</strong>
+          <small>Latest execution</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="security-progress mt-4">
+      <div class="security-progress-label">
+        <span>Selenium validation pass rate</span>
+        <strong id="progressLabel">0%</strong>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Selenium validation pass rate">
+        <div class="progress-bar" id="securityProgressBar" style="width: 0%"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-4">
+    <div class="row g-4">
+      <div class="col-xl-4">
+        <article class="security-test-section h-100">
+          <div class="security-section-heading saved-report-heading">
+            <span class="auth-badge bg-session">Session</span>
+            <h2>Session-Based Authentication</h2>
+            <p>Selenium opens protected pages, verifies login redirects, signs in with valid credentials, deletes the session cookie, and confirms protected access is blocked again.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-xl-4">
+        <article class="security-test-section h-100">
+          <div class="security-section-heading saved-report-heading">
+            <span class="auth-badge bg-jwt">JWT</span>
+            <h2>JWT Authentication</h2>
+            <p>Selenium validates missing Authorization headers, valid Bearer tokens, forged tokens, and cleared localStorage tokens against the stateless API route.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-xl-4">
+        <article class="security-test-section h-100">
+          <div class="security-section-heading saved-report-heading">
+            <span class="auth-badge bg-oauth">OAuth</span>
+            <h2>OAuth 2.0 Callback</h2>
+            <p>Selenium verifies that callback requests without a provider code or with a fake code fail. Real Google login is intentionally not automated.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-5">
+    <div class="security-test-section">
+      <div class="security-section-heading saved-report-heading">
+        <span class="eyebrow">Selenium Report</span>
+        <h2>Saved Attack Simulation Results</h2>
+        <p>
+          Run <code>npm run test:selenium</code> or <code>npm run test:selenium:demo</code> to generate <code>selenium-security-results.json</code>, then refresh this page to display the latest results.
+        </p>
+      </div>
+      <div id="savedSeleniumReport" class="security-saved-report">
+        <div class="security-empty">Checking for saved Selenium results...</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const savedReport = document.getElementById("savedSeleniumReport");
+  const summary = {
+    total: document.getElementById("summaryTotal"),
+    passed: document.getElementById("summaryPassed"),
+    failed: document.getElementById("summaryFailed"),
+    mode: document.getElementById("summaryMode"),
+    progressLabel: document.getElementById("progressLabel"),
+    progressBar: document.getElementById("securityProgressBar")
+  };
+
+  function statusClass(status) {
+    return {
+      PASS: "success",
+      FAIL: "danger",
+      WARNING: "warning"
+    }[status] || "secondary";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function renderSummary(report) {
+    const total = report && report.summary ? Number(report.summary.total || 0) : 0;
+    const passed = report && report.summary ? Number(report.summary.passed || 0) : 0;
+    const failed = report && report.summary ? Number(report.summary.failed || 0) : 0;
+    const percent = total === 0 ? 0 : Math.round((passed / total) * 100);
+
+    summary.total.textContent = total;
+    summary.passed.textContent = passed;
+    summary.failed.textContent = failed;
+    summary.mode.textContent = report ? (report.executionMode || report.chromeMode || "-") : "-";
+    summary.progressLabel.textContent = `${percent}%`;
+    summary.progressBar.style.width = `${percent}%`;
+    summary.progressBar.className = `progress-bar ${failed > 0 ? "bg-danger" : "bg-success"}`;
+  }
+
+  async function loadSavedSeleniumReport() {
+    if (!savedReport) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/security-tests/results", {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        renderSummary(null);
+        savedReport.innerHTML = `<div class="security-empty">${escapeHtml(payload.message || "No saved Selenium report found.")}</div>`;
+        return;
+      }
+
+      const report = payload.report;
+      renderSummary(report);
+
+      const rows = (report.results || [])
+        .map((result) => {
+          const badgeClass = statusClass(result.status);
+          const screenshot = result.screenshot
+            ? `<a href="/${escapeHtml(result.screenshot)}" target="_blank">Screenshot</a>`
+            : "Not captured";
+
+          return `
+            <tr>
+              <td>${escapeHtml(result.method)}</td>
+              <td>${escapeHtml(result.testName)}</td>
+              <td>${escapeHtml(result.expected)}</td>
+              <td>${escapeHtml(result.actual)}</td>
+              <td><span class="badge text-bg-${badgeClass}">${escapeHtml(result.status)}</span></td>
+              <td>${screenshot}</td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      savedReport.innerHTML = `
+        <div class="security-report-meta">
+          <span>Generated: <strong>${escapeHtml(report.generatedAt || "unknown")}</strong></span>
+          <span>Mode: <strong>${escapeHtml(report.executionMode || report.chromeMode || "unknown")}</strong></span>
+          <span>Total: <strong>${escapeHtml(report.summary ? report.summary.total : 0)}</strong></span>
+          <span>Passed: <strong>${escapeHtml(report.summary ? report.summary.passed : 0)}</strong></span>
+          <span>Failed: <strong>${escapeHtml(report.summary ? report.summary.failed : 0)}</strong></span>
+        </div>
+        <div class="table-responsive">
+          <table class="table metrics-table align-middle security-saved-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Attack Simulation</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th>Status</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows || '<tr><td colspan="6" class="text-center text-muted py-4">No saved rows.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    } catch (error) {
+      renderSummary(null);
+      savedReport.innerHTML = `<div class="security-empty">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  renderSummary(null);
+  loadSavedSeleniumReport();
+});
+</script>
+
+<%- include("../partials/footer") %>
