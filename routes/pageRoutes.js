@@ -14,5 +14,6 @@ router.get("/compare", pageController.comparePage);
 router.get("/metrics-dashboard", pageController.metricsDashboardPage);
 router.get("/security-tests", pageController.securityTestsPage);
 router.get("/security-tests/results", pageController.securityTestResults);
+router.get("/storage-visualization", pageController.storageVisualizationPage);
 
 module.exports = router;

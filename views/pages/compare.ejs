@@ -24,6 +24,317 @@
     <% }) %>
   </section>
 
+  <section class="oauth-flow-section auth-simulator-section mb-5">
+    <div class="metrics-section-title">
+      <div>
+        <span class="eyebrow">Session Flow</span>
+        <h2>Session-Based Flow Simulator</h2>
+      </div>
+      <p>
+        This frontend-only simulator shows how a server-side session is created and then reused through a browser cookie. It does not submit real credentials.
+      </p>
+    </div>
+
+    <div class="oauth-simulator-status mb-4">
+      <span class="badge text-bg-secondary" id="sessionCredentialsBadge">Credentials Verified: no</span>
+      <span class="badge text-bg-secondary" id="sessionCreatedBadge">Session Created: no</span>
+      <span class="badge text-bg-secondary" id="sessionCookieSentBadge">Cookie Sent: no</span>
+      <span class="badge text-bg-danger" id="sessionDashboardBadge">Dashboard Access: blocked</span>
+    </div>
+
+    <div class="oauth-flow-grid auth-flow-grid session-grid">
+      <div class="oauth-flow-step" data-session-step="browser">
+        <span class="oauth-step-number">1</span>
+        <h3>Browser</h3>
+        <p>User submits email and password from the browser login form.</p>
+      </div>
+      <div class="oauth-flow-step" data-session-step="server">
+        <span class="oauth-step-number">2</span>
+        <h3>Express Server</h3>
+        <p>Express and Passport verify submitted credentials.</p>
+      </div>
+      <div class="oauth-flow-step" data-session-step="store">
+        <span class="oauth-step-number">3</span>
+        <h3>Session Store</h3>
+        <p>The server creates authenticated session state.</p>
+      </div>
+      <div class="oauth-flow-step" data-session-step="cookie">
+        <span class="oauth-step-number">4</span>
+        <h3>Session Cookie</h3>
+        <p>The browser receives and later sends the <code>connect.sid</code> cookie automatically.</p>
+      </div>
+      <div class="oauth-flow-step" data-session-step="dashboard">
+        <span class="oauth-step-number">5</span>
+        <h3>Dashboard</h3>
+        <p>The dashboard opens after the server validates the session.</p>
+      </div>
+    </div>
+
+    <div class="oauth-simulator-controls mt-4">
+      <button class="btn btn-primary" type="button" data-session-action="start">Start Session Login</button>
+      <button class="btn btn-outline-dark" type="button" data-session-action="verify">Verify Credentials</button>
+      <button class="btn btn-outline-dark" type="button" data-session-action="create">Create Server Session</button>
+      <button class="btn btn-outline-dark" type="button" data-session-action="cookie">Send Cookie</button>
+      <button class="btn btn-outline-dark" type="button" data-session-action="dashboard">Access Dashboard</button>
+      <button class="btn btn-outline-danger" type="button" data-session-action="reset">Reset Session Flow</button>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-5">
+        <div class="oauth-current-panel">
+          <span class="eyebrow">Current Step</span>
+          <h3 id="sessionCurrentTitle">Ready to simulate session login</h3>
+          <p id="sessionCurrentDescription">
+            Click Start Session Login to visualize server-side session authentication.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="oauth-event-panel">
+          <div class="oauth-event-heading">
+            <span class="eyebrow">Event Log</span>
+            <button class="btn btn-sm btn-outline-dark" type="button" data-session-action="reset">Clear</button>
+          </div>
+          <ol id="sessionEventLog">
+            <li>Session simulator ready. No real login request has been sent.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="oauth-flow-section auth-simulator-section mb-5">
+    <div class="metrics-section-title">
+      <div>
+        <span class="eyebrow">JWT Flow</span>
+        <h2>JWT Flow Simulator</h2>
+      </div>
+      <p>
+        This frontend-only simulator shows how a signed token is issued, stored in the browser, and sent manually in the Authorization header for protected API access.
+      </p>
+    </div>
+
+    <div class="oauth-simulator-status mb-4">
+      <span class="badge text-bg-secondary" id="jwtCredentialsBadge">Credentials Verified: no</span>
+      <span class="badge text-bg-secondary" id="jwtGeneratedBadge">JWT Generated: no</span>
+      <span class="badge text-bg-secondary" id="jwtStoredBadge">Token Stored: no</span>
+      <span class="badge text-bg-secondary" id="jwtBearerBadge">Bearer Header Sent: no</span>
+      <span class="badge text-bg-secondary" id="jwtSignatureBadge">Signature Valid: no</span>
+      <span class="badge text-bg-danger" id="jwtApiAccessBadge">API Access: blocked</span>
+    </div>
+
+    <div class="oauth-flow-grid auth-flow-grid jwt-grid">
+      <div class="oauth-flow-step" data-jwt-step="browser">
+        <span class="oauth-step-number">1</span>
+        <h3>Browser</h3>
+        <p>User submits email and password from the JWT login form.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="server">
+        <span class="oauth-step-number">2</span>
+        <h3>Express Server</h3>
+        <p>The server verifies submitted credentials before issuing a token.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="generated">
+        <span class="oauth-step-number">3</span>
+        <h3>JWT Generated</h3>
+        <p>The server generates a signed JWT containing authentication claims.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="storage">
+        <span class="oauth-step-number">4</span>
+        <h3>localStorage JWT</h3>
+        <p>The browser stores the signed token in <code>localStorage["jwtToken"]</code>.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="header">
+        <span class="oauth-step-number">5</span>
+        <h3>Authorization Header</h3>
+        <p>The client sends <code>Authorization: Bearer &lt;JWT&gt;</code>.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="verify">
+        <span class="oauth-step-number">6</span>
+        <h3>JWT Verification</h3>
+        <p>The server verifies the JWT signature and token claims.</p>
+      </div>
+      <div class="oauth-flow-step" data-jwt-step="api">
+        <span class="oauth-step-number">7</span>
+        <h3>Protected API</h3>
+        <p>The API returns protected data after successful token validation.</p>
+      </div>
+    </div>
+
+    <div class="oauth-simulator-controls mt-4">
+      <button class="btn btn-primary" type="button" data-jwt-action="start">Start JWT Login</button>
+      <button class="btn btn-outline-dark" type="button" data-jwt-action="generate">Generate JWT</button>
+      <button class="btn btn-outline-dark" type="button" data-jwt-action="store">Store Token</button>
+      <button class="btn btn-outline-dark" type="button" data-jwt-action="send">Send Bearer Token</button>
+      <button class="btn btn-outline-dark" type="button" data-jwt-action="verify">Verify Token</button>
+      <button class="btn btn-outline-dark" type="button" data-jwt-action="access">API Access Granted</button>
+      <button class="btn btn-outline-danger" type="button" data-jwt-action="reset">Reset JWT Flow</button>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-5">
+        <div class="oauth-current-panel">
+          <span class="eyebrow">Current Step</span>
+          <h3 id="jwtCurrentTitle">Ready to simulate JWT login</h3>
+          <p id="jwtCurrentDescription">
+            Click Start JWT Login to visualize stateless bearer-token authentication.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="oauth-event-panel">
+          <div class="oauth-event-heading">
+            <span class="eyebrow">Event Log</span>
+            <button class="btn btn-sm btn-outline-dark" type="button" data-jwt-action="reset">Clear</button>
+          </div>
+          <ol id="jwtEventLog">
+            <li>JWT simulator ready. No real login request has been sent.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="oauth-flow-section mb-5">
+    <div class="metrics-section-title">
+      <div>
+        <span class="eyebrow">OAuth Flow</span>
+        <h2>Interactive OAuth 2.0 Flow Simulator</h2>
+      </div>
+      <p>
+        This simulator visualizes the OAuth 2.0 login flow used by the prototype. In the real implementation, Google performs user authentication, and after the callback the application creates a local session.
+      </p>
+    </div>
+
+    <div class="oauth-simulator-status mb-4">
+      <span class="badge text-bg-warning">External Provider: Google</span>
+      <span class="badge text-bg-secondary" id="callbackBadge">Callback Received: no</span>
+      <span class="badge text-bg-secondary" id="localUserBadge">Local User Created: no</span>
+      <span class="badge text-bg-secondary" id="localSessionBadge">Local Session Created: no</span>
+      <span class="badge text-bg-danger" id="dashboardBadge">Dashboard Access: blocked</span>
+    </div>
+
+    <div class="oauth-flow-grid interactive">
+      <div class="oauth-flow-step" data-oauth-step="user">
+        <span class="oauth-step-number">1</span>
+        <h3>User</h3>
+        <p>User starts Google login from the application login page.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="app">
+        <span class="oauth-step-number">2</span>
+        <h3>Application</h3>
+        <p>Application redirects user to Google using the OAuth authorization flow.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="google">
+        <span class="oauth-step-number">3</span>
+        <h3>Google OAuth Provider</h3>
+        <p>Google authenticates user and asks for consent when required.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="callback">
+        <span class="oauth-step-number">4</span>
+        <h3>Callback Route</h3>
+        <p>Google returns authorization data to the callback route.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="mongo">
+        <span class="oauth-step-number">5</span>
+        <h3>MongoDB User Record</h3>
+        <p>Application finds or creates user in MongoDB using provider profile data.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="session">
+        <span class="oauth-step-number">6</span>
+        <h3>Local Session</h3>
+        <p>Application creates local session after successful OAuth authentication.</p>
+      </div>
+      <div class="oauth-flow-step" data-oauth-step="dashboard">
+        <span class="oauth-step-number">7</span>
+        <h3>Dashboard</h3>
+        <p>User accesses dashboard through the local authenticated session.</p>
+      </div>
+    </div>
+
+    <div class="oauth-simulator-controls mt-4">
+      <button class="btn btn-primary" type="button" data-oauth-action="start">Start OAuth Login</button>
+      <button class="btn btn-outline-dark" type="button" data-oauth-action="redirect">Redirect to Google</button>
+      <button class="btn btn-outline-dark" type="button" data-oauth-action="callback">Return Callback</button>
+      <button class="btn btn-outline-dark" type="button" data-oauth-action="user">Create/Update Local User</button>
+      <button class="btn btn-outline-dark" type="button" data-oauth-action="session">Create Local Session</button>
+      <button class="btn btn-outline-dark" type="button" data-oauth-action="dashboard">Open Dashboard</button>
+      <button class="btn btn-outline-danger" type="button" data-oauth-action="reset">Reset Flow</button>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-5">
+        <div class="oauth-current-panel">
+          <span class="eyebrow">Current Step</span>
+          <h3 id="oauthCurrentTitle">Ready to simulate OAuth login</h3>
+          <p id="oauthCurrentDescription">
+            Click Start OAuth Login to begin a frontend-only visualization. No real Google login will be triggered.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="oauth-event-panel">
+          <div class="oauth-event-heading">
+            <span class="eyebrow">Event Log</span>
+            <button class="btn btn-sm btn-outline-dark" type="button" data-oauth-action="reset">Clear</button>
+          </div>
+          <ol id="oauthEventLog">
+            <li>Simulator ready. No real OAuth request has been sent.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="oauth-comparison-note mt-4">
+      <div>
+        <span class="badge bg-session">Session</span>
+        <p>Application verifies credentials locally and stores session state.</p>
+      </div>
+      <div>
+        <span class="badge bg-jwt">JWT</span>
+        <p>Application issues a signed token for protected API requests.</p>
+      </div>
+      <div>
+        <span class="badge bg-oauth">OAuth</span>
+        <p>External provider verifies user identity before the app creates local state.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-simulator-summary mb-5">
+    <div class="metrics-section-title">
+      <div>
+        <span class="eyebrow">Final Summary</span>
+        <h2>Interactive Flow Comparison</h2>
+      </div>
+      <p>All three simulators are frontend-only educational views. They explain behavior without triggering real login requests.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="info-card h-100">
+          <span class="badge bg-session mb-3">Session</span>
+          <h3>Server-side state</h3>
+          <p class="mb-0">The browser sends the session cookie automatically, and the server validates session state before opening protected pages.</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="info-card h-100">
+          <span class="badge bg-jwt mb-3">JWT</span>
+          <h3>Stateless bearer token</h3>
+          <p class="mb-0">The client stores the JWT and sends the Bearer token manually with protected API requests.</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="info-card h-100">
+          <span class="badge bg-oauth mb-3">OAuth</span>
+          <h3>External identity provider</h3>
+          <p class="mb-0">Google authenticates the user externally, then this prototype creates a local session after the callback.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="auth-card">
     <div class="table-responsive">
       <table class="table comparison-table align-middle">
@@ -70,5 +381,566 @@
     </div>
   </section>
 </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function setupAuthSimulator(config) {
+    const flowSteps = Array.from(document.querySelectorAll(config.stepSelector));
+    const actionButtons = Array.from(document.querySelectorAll(config.actionSelector));
+    const currentTitle = document.getElementById(config.currentTitleId);
+    const currentDescription = document.getElementById(config.currentDescriptionId);
+    const eventLog = document.getElementById(config.eventLogId);
+    let nextStepIndex = 0;
+
+    function setBadge(key, value) {
+      const badgeConfig = config.badges[key];
+      const element = document.getElementById(badgeConfig.id);
+
+      if (badgeConfig.type === "access") {
+        element.textContent = `${badgeConfig.label}: ${value ? "granted" : "blocked"}`;
+        element.className = `badge ${value ? "text-bg-success" : "text-bg-danger"}`;
+        return;
+      }
+
+      element.textContent = `${badgeConfig.label}: ${value ? "yes" : "no"}`;
+      element.className = `badge ${value ? "text-bg-success" : "text-bg-secondary"}`;
+    }
+
+    function appendEvents(events) {
+      events.forEach((eventText) => {
+        const item = document.createElement("li");
+        item.textContent = eventText;
+        eventLog.appendChild(item);
+      });
+    }
+
+    function activateStep(stepIndex) {
+      const stepConfig = config.steps[stepIndex];
+      const activeIndex = flowSteps.findIndex((step) => step.dataset[config.stepDatasetKey] === stepConfig.card);
+
+      flowSteps.forEach((step, index) => {
+        step.classList.toggle("active", step.dataset[config.stepDatasetKey] === stepConfig.card);
+        step.classList.toggle("completed", activeIndex >= 0 && index < activeIndex);
+        step.classList.toggle("active-connection", activeIndex >= 0 && index === activeIndex - 1);
+      });
+    }
+
+    function updateButtonState() {
+      actionButtons.forEach((button) => {
+        const action = button.dataset[config.actionDatasetKey];
+
+        if (action === "reset") {
+          button.disabled = false;
+          button.classList.remove("simulator-button-disabled");
+          return;
+        }
+
+        const isCurrentAction = config.steps[nextStepIndex] && action === config.steps[nextStepIndex].action;
+        button.disabled = !isCurrentAction;
+        button.classList.toggle("simulator-button-disabled", !isCurrentAction);
+      });
+    }
+
+    function setSimulatorStep(stepIndex) {
+      const step = config.steps[stepIndex];
+      if (!step) {
+        return;
+      }
+
+      const stepName = step.name;
+      if (config.logLabel === "Session") {
+        console.log("Session step:", stepIndex, stepName);
+      } else {
+        console.log(`${config.logLabel} step:`, stepIndex, stepName);
+      }
+
+      activateStep(stepIndex);
+      currentTitle.textContent = step.title;
+      currentDescription.textContent = step.description;
+      appendEvents(step.events);
+
+      Object.keys(config.badges).forEach((key) => {
+        setBadge(key, Boolean(step.badges && step.badges[key]));
+      });
+
+      nextStepIndex = Math.min(stepIndex + 1, config.steps.length);
+      updateButtonState();
+    }
+
+    function applyStep(action) {
+      const stepIndex = config.steps.findIndex((step) => step.action === action);
+
+      if (stepIndex !== nextStepIndex) {
+        return;
+      }
+
+      setSimulatorStep(stepIndex);
+    }
+
+    function resetFlow() {
+      nextStepIndex = 0;
+
+      flowSteps.forEach((step) => {
+        step.classList.remove("active", "completed", "active-connection");
+      });
+
+      currentTitle.textContent = config.initialTitle;
+      currentDescription.textContent = config.initialDescription;
+      eventLog.innerHTML = `<li>${config.initialLog}</li>`;
+
+      Object.keys(config.badges).forEach((key) => {
+        setBadge(key, false);
+      });
+
+      updateButtonState();
+    }
+
+    actionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const action = button.dataset[config.actionDatasetKey];
+
+        if (action === "reset") {
+          resetFlow();
+          return;
+        }
+
+        applyStep(action);
+      });
+    });
+
+    resetFlow();
+  }
+
+  setupAuthSimulator({
+    stepSelector: "[data-session-step]",
+    actionSelector: "[data-session-action]",
+    stepDatasetKey: "sessionStep",
+    actionDatasetKey: "sessionAction",
+    currentTitleId: "sessionCurrentTitle",
+    currentDescriptionId: "sessionCurrentDescription",
+    eventLogId: "sessionEventLog",
+    logLabel: "Session",
+    initialTitle: "Ready to simulate session login",
+    initialDescription: "Click Start Session Login to visualize server-side session authentication.",
+    initialLog: "Session simulator ready. No real login request has been sent.",
+    badges: {
+      credentialsVerified: { id: "sessionCredentialsBadge", label: "Credentials Verified" },
+      sessionCreated: { id: "sessionCreatedBadge", label: "Session Created" },
+      cookieSent: { id: "sessionCookieSentBadge", label: "Cookie Sent" },
+      dashboardAccess: { id: "sessionDashboardBadge", label: "Dashboard Access", type: "access" }
+    },
+    steps: [
+      {
+        action: "start",
+        card: "browser",
+        name: "Browser / Start Session Login",
+        title: "User submits credentials",
+        description: "The user enters email and password into the session login form.",
+        events: ["User submits email and password", "POST /auth/login/local"],
+        badges: {}
+      },
+      {
+        action: "verify",
+        card: "server",
+        name: "Express Server verifies credentials",
+        title: "Express Server verifies credentials",
+        description: "Passport Local checks the submitted email and password.",
+        events: ["Server verifies credentials"],
+        badges: { credentialsVerified: true }
+      },
+      {
+        action: "create",
+        card: "store",
+        name: "Session Store creates server-side session",
+        title: "Server creates session",
+        description: "After successful credential verification, the server stores authenticated state.",
+        events: ["Server creates session"],
+        badges: { credentialsVerified: true, sessionCreated: true }
+      },
+      {
+        action: "cookie",
+        card: "cookie",
+        name: "Session Cookie is sent to browser",
+        title: "Browser sends session cookie",
+        description: "The browser automatically sends the session identifier cookie on later requests.",
+        events: ["Set-Cookie: connect.sid", "Browser automatically sends cookie"],
+        badges: { credentialsVerified: true, sessionCreated: true, cookieSent: true }
+      },
+      {
+        action: "dashboard",
+        card: "dashboard",
+        name: "Dashboard access granted",
+        title: "Dashboard access granted",
+        description: "The server validates the session and allows access to the protected dashboard.",
+        events: ["GET /dashboard", "Server validates session", "Access granted"],
+        badges: { credentialsVerified: true, sessionCreated: true, cookieSent: true, dashboardAccess: true }
+      }
+    ]
+  });
+
+  const jwtFlowSteps = Array.from(document.querySelectorAll("[data-jwt-step]"));
+  const jwtActionButtons = Array.from(document.querySelectorAll("[data-jwt-action]"));
+  const jwtCurrentTitle = document.getElementById("jwtCurrentTitle");
+  const jwtCurrentDescription = document.getElementById("jwtCurrentDescription");
+  const jwtEventLog = document.getElementById("jwtEventLog");
+  const jwtBadgeMap = {
+    credentialsVerified: { id: "jwtCredentialsBadge", label: "Credentials Verified" },
+    jwtGenerated: { id: "jwtGeneratedBadge", label: "JWT Generated" },
+    tokenStored: { id: "jwtStoredBadge", label: "Token Stored" },
+    bearerHeaderSent: { id: "jwtBearerBadge", label: "Bearer Header Sent" },
+    signatureValid: { id: "jwtSignatureBadge", label: "Signature Valid" },
+    apiAccess: { id: "jwtApiAccessBadge", label: "API Access", type: "access" }
+  };
+  const jwtSteps = [
+    {
+      action: "start",
+      card: "browser",
+      name: "Browser / Start JWT Login",
+      title: "User submits JWT login credentials",
+      description: "The user enters email and password into the JWT login form. The Express server verifies credentials as part of this login request.",
+      events: ["User submits email and password", "POST /auth/login/jwt", "Server verifies credentials"],
+      badges: { credentialsVerified: true }
+    },
+    {
+      action: null,
+      card: "server",
+      name: "Express Server verifies credentials",
+      title: "Express Server verifies credentials",
+      description: "This state is completed during Start JWT Login, before the server can generate a signed JWT.",
+      events: [],
+      badges: { credentialsVerified: true }
+    },
+    {
+      action: "generate",
+      card: "generated",
+      name: "JWT Generated",
+      title: "Server generates signed JWT",
+      description: "The server signs a JWT containing user identity claims.",
+      events: ["Server generates signed JWT"],
+      badges: { credentialsVerified: true, jwtGenerated: true }
+    },
+    {
+      action: "store",
+      card: "storage",
+      name: "localStorage JWT stores token",
+      title: "Browser stores token",
+      description: "The browser stores the generated JWT in localStorage.",
+      events: ["Browser stores JWT in localStorage"],
+      badges: { credentialsVerified: true, jwtGenerated: true, tokenStored: true }
+    },
+    {
+      action: "send",
+      card: "header",
+      name: "Authorization Header sends Bearer token",
+      title: "Client sends Bearer token",
+      description: "The client attaches the JWT manually to the Authorization header.",
+      events: ["GET /api/profile", "Authorization: Bearer <JWT>"],
+      badges: { credentialsVerified: true, jwtGenerated: true, tokenStored: true, bearerHeaderSent: true }
+    },
+    {
+      action: "verify",
+      card: "verify",
+      name: "JWT Verification validates signature",
+      title: "Server verifies JWT signature",
+      description: "The server checks the JWT signature and validates token claims.",
+      events: ["Server verifies JWT signature"],
+      badges: { credentialsVerified: true, jwtGenerated: true, tokenStored: true, bearerHeaderSent: true, signatureValid: true }
+    },
+    {
+      action: "access",
+      card: "api",
+      name: "Protected API access granted",
+      title: "Protected API access granted",
+      description: "The protected API returns profile data after successful JWT verification.",
+      events: ["Access granted"],
+      badges: { credentialsVerified: true, jwtGenerated: true, tokenStored: true, bearerHeaderSent: true, signatureValid: true, apiAccess: true }
+    }
+  ];
+  const jwtButtonStepMap = {
+    start: 0,
+    generate: 2,
+    store: 3,
+    send: 4,
+    verify: 5,
+    access: 6
+  };
+  const jwtButtonOrder = ["start", "generate", "store", "send", "verify", "access"];
+  let jwtNextButtonIndex = 0;
+
+  function setJwtBadge(key, value) {
+    const badgeConfig = jwtBadgeMap[key];
+    const element = document.getElementById(badgeConfig.id);
+
+    if (badgeConfig.type === "access") {
+      element.textContent = `${badgeConfig.label}: ${value ? "granted" : "blocked"}`;
+      element.className = `badge ${value ? "text-bg-success" : "text-bg-danger"}`;
+      return;
+    }
+
+    element.textContent = `${badgeConfig.label}: ${value ? "yes" : "no"}`;
+    element.className = `badge ${value ? "text-bg-success" : "text-bg-secondary"}`;
+  }
+
+  function updateJwtButtons() {
+    jwtActionButtons.forEach((button) => {
+      const action = button.dataset.jwtAction;
+
+      if (action === "reset") {
+        button.disabled = false;
+        button.classList.remove("simulator-button-disabled");
+        return;
+      }
+
+      const isCurrentAction = action === jwtButtonOrder[jwtNextButtonIndex];
+      button.disabled = !isCurrentAction;
+      button.classList.toggle("simulator-button-disabled", !isCurrentAction);
+    });
+  }
+
+  function appendJwtEvents(events) {
+    events.forEach((eventText) => {
+      const item = document.createElement("li");
+      item.textContent = eventText;
+      jwtEventLog.appendChild(item);
+    });
+  }
+
+  function setJwtStep(stepIndex) {
+    const step = jwtSteps[stepIndex];
+    if (!step) {
+      return;
+    }
+
+    console.log("JWT step:", stepIndex, step.name);
+
+    const activeIndex = jwtFlowSteps.findIndex((card) => card.dataset.jwtStep === step.card);
+    jwtFlowSteps.forEach((card, index) => {
+      card.classList.toggle("active", card.dataset.jwtStep === step.card);
+      card.classList.toggle("completed", activeIndex >= 0 && index < activeIndex);
+      card.classList.toggle("active-connection", activeIndex >= 0 && index === activeIndex - 1);
+    });
+
+    jwtCurrentTitle.textContent = step.title;
+    jwtCurrentDescription.textContent = step.description;
+    appendJwtEvents(step.events);
+
+    Object.keys(jwtBadgeMap).forEach((key) => {
+      setJwtBadge(key, Boolean(step.badges && step.badges[key]));
+    });
+
+    const clickedAction = step.action;
+    if (clickedAction) {
+      const clickedButtonIndex = jwtButtonOrder.indexOf(clickedAction);
+      jwtNextButtonIndex = Math.min(clickedButtonIndex + 1, jwtButtonOrder.length);
+    }
+
+    updateJwtButtons();
+  }
+
+  function resetJwtFlow() {
+    jwtNextButtonIndex = 0;
+    jwtFlowSteps.forEach((card) => {
+      card.classList.remove("active", "completed", "active-connection");
+    });
+
+    jwtCurrentTitle.textContent = "Ready to simulate JWT login";
+    jwtCurrentDescription.textContent = "Click Start JWT Login to visualize stateless bearer-token authentication.";
+    jwtEventLog.innerHTML = "<li>JWT simulator ready. No real login request has been sent.</li>";
+    Object.keys(jwtBadgeMap).forEach((key) => setJwtBadge(key, false));
+    updateJwtButtons();
+  }
+
+  jwtActionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.jwtAction;
+
+      if (action === "reset") {
+        resetJwtFlow();
+        return;
+      }
+
+      if (action !== jwtButtonOrder[jwtNextButtonIndex]) {
+        return;
+      }
+
+      setJwtStep(jwtButtonStepMap[action]);
+    });
+  });
+
+  resetJwtFlow();
+
+  const flowSteps = Array.from(document.querySelectorAll("[data-oauth-step]"));
+  const actionButtons = Array.from(document.querySelectorAll("[data-oauth-action]"));
+  const currentTitle = document.getElementById("oauthCurrentTitle");
+  const currentDescription = document.getElementById("oauthCurrentDescription");
+  const eventLog = document.getElementById("oauthEventLog");
+  const callbackBadge = document.getElementById("callbackBadge");
+  const localUserBadge = document.getElementById("localUserBadge");
+  const localSessionBadge = document.getElementById("localSessionBadge");
+  const dashboardBadge = document.getElementById("dashboardBadge");
+  let oauthCurrentActionIndex = 0;
+
+  const oauthSteps = [
+    {
+      action: "start",
+      card: "user",
+      name: "User starts Google login",
+      title: "User starts Google login",
+      description: "The user clicks Login with Google on the application login page.",
+      events: ['User clicked "Login with Google"', "GET /auth/google"],
+      badges: {}
+    },
+    {
+      action: "redirect",
+      card: "google",
+      name: "Redirect to Google",
+      title: "Application redirects to Google",
+      description: "The application sends the browser to the Google OAuth provider.",
+      events: ["302 Redirect to Google OAuth provider", "Google authenticates user"],
+      badges: {}
+    },
+    {
+      action: "callback",
+      card: "callback",
+      name: "Return Callback",
+      title: "Callback route receives authorization data",
+      description: "Google returns the browser to the callback route with authorization data.",
+      events: ["GET /auth/google/callback?code=AUTH_CODE"],
+      badges: { callbackReceived: true }
+    },
+    {
+      action: "user",
+      card: "mongo",
+      name: "Create/Update Local User",
+      title: "Application finds or creates local user",
+      description: "The callback handler maps the Google profile to a local MongoDB user record.",
+      events: ["Application finds or creates user in MongoDB"],
+      badges: { callbackReceived: true, localUserCreated: true }
+    },
+    {
+      action: "session",
+      card: "session",
+      name: "Create Local Session",
+      title: "Application creates local session",
+      description: "Passport serializes the authenticated user and Express stores a local session.",
+      events: ["Application establishes local session", "Set-Cookie: connect.sid"],
+      badges: { callbackReceived: true, localUserCreated: true, localSessionCreated: true }
+    },
+    {
+      action: "dashboard",
+      card: "dashboard",
+      name: "Open Dashboard",
+      title: "User accesses dashboard",
+      description: "The dashboard is opened using the local session created after OAuth callback.",
+      events: ["Redirect to /dashboard"],
+      badges: { callbackReceived: true, localUserCreated: true, localSessionCreated: true, dashboardGranted: true }
+    }
+  ];
+
+  function setBadge(element, label, value, grantedClass = "text-bg-success") {
+    element.textContent = `${label}: ${value}`;
+    element.className = `badge ${value === "yes" || value === "granted" ? grantedClass : "text-bg-secondary"}`;
+  }
+
+  function setDashboardBadge(granted) {
+    dashboardBadge.textContent = `Dashboard Access: ${granted ? "granted" : "blocked"}`;
+    dashboardBadge.className = `badge ${granted ? "text-bg-success" : "text-bg-danger"}`;
+  }
+
+  function appendEvents(events) {
+    events.forEach((eventText) => {
+      const item = document.createElement("li");
+      item.textContent = eventText;
+      eventLog.appendChild(item);
+    });
+  }
+
+  function activateStep(stepIndex) {
+    const activeIndex = flowSteps.findIndex((step) => step.dataset.oauthStep === oauthSteps[stepIndex].card);
+
+    flowSteps.forEach((step, index) => {
+      step.classList.toggle("active", step.dataset.oauthStep === oauthSteps[stepIndex].card);
+      step.classList.toggle("completed", activeIndex >= 0 && index < activeIndex);
+      step.classList.toggle("active-connection", activeIndex >= 0 && index === activeIndex - 1);
+    });
+  }
+
+  function updateOAuthButtonState() {
+    actionButtons.forEach((button) => {
+      const action = button.dataset.oauthAction;
+
+      if (action === "reset") {
+        button.disabled = false;
+        button.classList.remove("simulator-button-disabled");
+        return;
+      }
+
+      const isCurrentAction = oauthSteps[oauthCurrentActionIndex] && action === oauthSteps[oauthCurrentActionIndex].action;
+      button.disabled = !isCurrentAction;
+      button.classList.toggle("simulator-button-disabled", !isCurrentAction);
+    });
+  }
+
+  function applyStep(action) {
+    const stepIndex = oauthSteps.findIndex((step) => step.action === action);
+
+    if (stepIndex !== oauthCurrentActionIndex) {
+      return;
+    }
+
+    const step = oauthSteps[stepIndex];
+    if (!step) {
+      return;
+    }
+
+    console.log("OAuth step:", stepIndex, step.name);
+
+    activateStep(stepIndex);
+    currentTitle.textContent = step.title;
+    currentDescription.textContent = step.description;
+    appendEvents(step.events);
+
+    setBadge(callbackBadge, "Callback Received", step.badges.callbackReceived ? "yes" : "no");
+    setBadge(localUserBadge, "Local User Created", step.badges.localUserCreated ? "yes" : "no");
+    setBadge(localSessionBadge, "Local Session Created", step.badges.localSessionCreated ? "yes" : "no");
+    setDashboardBadge(Boolean(step.badges.dashboardGranted));
+
+    oauthCurrentActionIndex = Math.min(oauthCurrentActionIndex + 1, oauthSteps.length);
+    updateOAuthButtonState();
+  }
+
+  function resetFlow() {
+    oauthCurrentActionIndex = 0;
+
+    flowSteps.forEach((step) => {
+      step.classList.remove("active", "completed", "active-connection");
+    });
+
+    currentTitle.textContent = "Ready to simulate OAuth login";
+    currentDescription.textContent = "Click Start OAuth Login to begin a frontend-only visualization. No real Google login will be triggered.";
+    eventLog.innerHTML = "<li>Simulator ready. No real OAuth request has been sent.</li>";
+    setBadge(callbackBadge, "Callback Received", "no");
+    setBadge(localUserBadge, "Local User Created", "no");
+    setBadge(localSessionBadge, "Local Session Created", "no");
+    setDashboardBadge(false);
+    updateOAuthButtonState();
+  }
+
+  actionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.oauthAction;
+
+      if (action === "reset") {
+        resetFlow();
+        return;
+      }
+
+      applyStep(action);
+    });
+  });
+
+  resetFlow();
+});
+</script>
 
 <%- include("../partials/footer") %>

@@ -242,6 +242,12 @@ exports.securityTestsPage = (req, res) => {
   });
 };
 
+exports.storageVisualizationPage = (req, res) => {
+  res.render("pages/storage-visualization", {
+    title: "Storage Visualization"
+  });
+};
+
 exports.securityTestResults = (req, res) => {
   const resultsPath = path.join(__dirname, "..", "selenium-security-results.json");
 

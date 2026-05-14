@@ -1,0 +1,366 @@
+<%- include("../partials/header") %>
+<%- include("../partials/navbar") %>
+
+<main class="storage-page">
+  <section class="storage-top">
+    <div class="container py-5">
+      <span class="eyebrow">Storage Model</span>
+      <h1 class="section-title">Session vs JWT Storage Visualization</h1>
+      <p class="storage-lead">
+        Session-based authentication keeps authentication state on the server and uses a cookie as an identifier. JWT authentication stores authentication claims in a token on the client side and sends it with protected API requests.
+      </p>
+    </div>
+  </section>
+
+  <section class="container py-5">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <article class="storage-card session h-100">
+          <div class="storage-card-header">
+            <span class="auth-badge bg-session">Session</span>
+            <h2>Session-Based Storage</h2>
+          </div>
+
+          <div class="storage-facts">
+            <div>
+              <span>Credential type</span>
+              <strong>Session ID cookie</strong>
+            </div>
+            <div>
+              <span>Storage</span>
+              <strong>Browser cookie + server-side session</strong>
+            </div>
+            <div>
+              <span>Server state</span>
+              <strong>Yes</strong>
+            </div>
+            <div>
+              <span>JavaScript access</span>
+              <strong>Not accessible if HttpOnly</strong>
+            </div>
+          </div>
+
+          <button class="btn btn-outline-dark w-100 mt-4" type="button" id="checkCookieButton">
+            Check document.cookie
+          </button>
+          <div class="storage-output mt-3" id="cookieResult">
+            Click the button to inspect readable browser cookies.
+          </div>
+        </article>
+      </div>
+
+      <div class="col-lg-6">
+        <article class="storage-card jwt h-100">
+          <div class="storage-card-header">
+            <span class="auth-badge bg-jwt">JWT</span>
+            <h2>JWT Storage</h2>
+          </div>
+
+          <div class="storage-facts">
+            <div>
+              <span>Credential type</span>
+              <strong>JWT token</strong>
+            </div>
+            <div>
+              <span>Storage</span>
+              <strong>localStorage</strong>
+            </div>
+            <div>
+              <span>Server state</span>
+              <strong>No</strong>
+            </div>
+            <div>
+              <span>JavaScript access</span>
+              <strong>Accessible</strong>
+            </div>
+          </div>
+
+          <button class="btn btn-outline-dark w-100 mt-4" type="button" id="checkLocalStorageButton">
+            Check localStorage
+          </button>
+          <div class="storage-output mt-3" id="jwtResult">
+            Click the button to inspect the JWT token stored by this app.
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-5">
+    <div class="storage-replay-card">
+      <div class="metrics-section-title">
+        <div>
+          <span class="eyebrow">Replay Demo</span>
+          <h2>JWT Replay Demonstration</h2>
+        </div>
+        <p>JWT replay means that the same valid token can be sent multiple times to access protected API resources until it expires. This demonstrates a key trade-off of stateless token-based authentication.</p>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="storage-state-box">
+            <span>Current JWT detected</span>
+            <strong id="replayTokenDetected">no</strong>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="storage-state-box">
+            <span>Token preview</span>
+            <strong id="replayTokenPreview">No token</strong>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="storage-state-box">
+            <span>Token length</span>
+            <strong id="replayTokenLength">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="storage-replay-actions mt-4">
+        <button class="btn btn-primary" type="button" id="useCurrentJwtButton">Use Current JWT Token</button>
+        <button class="btn btn-outline-danger" type="button" id="useFakeJwtButton">Use Fake JWT Token</button>
+        <button class="btn btn-outline-dark" type="button" id="clearJwtReplayButton">Clear JWT Token</button>
+      </div>
+
+      <div class="storage-replay-result mt-4" id="replayResult">
+        Run a replay action to see how the protected JWT API responds.
+      </div>
+
+      <div class="storage-comparison-note mt-4">
+        <div>
+          <span class="badge bg-session">Session</span>
+          <p>Session depends on server-side session state.</p>
+        </div>
+        <div>
+          <span class="badge bg-jwt">JWT</span>
+          <p>JWT depends on client-side token validity and signature verification.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-5">
+    <div class="metrics-panel">
+      <div class="metrics-section-title">
+        <div>
+          <span class="eyebrow">Comparison</span>
+          <h2>Storage Behavior Table</h2>
+        </div>
+        <p>This table summarizes how the two implemented authentication methods keep and transmit authentication state.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="table metrics-table align-middle">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Session-Based</th>
+              <th>JWT-Based</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Credential</strong></td>
+              <td>Session identifier, usually stored as <code>connect.sid</code></td>
+              <td>Signed JWT token stored by the app as <code>jwtToken</code></td>
+            </tr>
+            <tr>
+              <td><strong>Storage location</strong></td>
+              <td>Browser cookie plus server-side session storage</td>
+              <td>Browser <code>localStorage</code></td>
+            </tr>
+            <tr>
+              <td><strong>Server-side state</strong></td>
+              <td>Yes, the server keeps session state</td>
+              <td>No for stateless protected API validation</td>
+            </tr>
+            <tr>
+              <td><strong>JavaScript accessibility</strong></td>
+              <td>HttpOnly cookies are not readable by JavaScript</td>
+              <td>Readable by JavaScript from <code>localStorage</code></td>
+            </tr>
+            <tr>
+              <td><strong>Typical security risk</strong></td>
+              <td>Session hijacking if cookies are stolen or poorly protected</td>
+              <td>Token theft through XSS or unsafe client-side storage</td>
+            </tr>
+            <tr>
+              <td><strong>Suitable usage</strong></td>
+              <td>Classic server-rendered web applications and dashboards</td>
+              <td>APIs, SPAs, mobile clients, and distributed services</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const checkCookieButton = document.getElementById("checkCookieButton");
+  const checkLocalStorageButton = document.getElementById("checkLocalStorageButton");
+  const cookieResult = document.getElementById("cookieResult");
+  const jwtResult = document.getElementById("jwtResult");
+  const replayTokenDetected = document.getElementById("replayTokenDetected");
+  const replayTokenPreview = document.getElementById("replayTokenPreview");
+  const replayTokenLength = document.getElementById("replayTokenLength");
+  const useCurrentJwtButton = document.getElementById("useCurrentJwtButton");
+  const useFakeJwtButton = document.getElementById("useFakeJwtButton");
+  const clearJwtReplayButton = document.getElementById("clearJwtReplayButton");
+  const replayResult = document.getElementById("replayResult");
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function getJwtToken() {
+    return localStorage.getItem("jwtToken");
+  }
+
+  function tokenPreview(token) {
+    return token ? `${token.slice(0, 30)}...` : "No token";
+  }
+
+  function updateReplayTokenState(message) {
+    const token = getJwtToken();
+
+    replayTokenDetected.textContent = token ? "yes" : "no";
+    replayTokenPreview.textContent = tokenPreview(token);
+    replayTokenLength.textContent = token ? token.length : "0";
+
+    if (message) {
+      replayResult.innerHTML = escapeHtml(message);
+    }
+  }
+
+  function responsePreview(data) {
+    const text = JSON.stringify(data, null, 2);
+    return text.length > 220 ? `${text.slice(0, 220)}...` : text;
+  }
+
+  function renderReplayResult({ statusCode, granted, preview, explanation }) {
+    const resultText = granted ? "Access Granted" : "Access Denied";
+    const badgeClass = granted ? "success" : "danger";
+
+    replayResult.innerHTML = `
+      <div class="storage-replay-response">
+        <div class="storage-replay-status">
+          <span>Status code</span>
+          <strong>${escapeHtml(statusCode)}</strong>
+        </div>
+        <div class="storage-replay-status">
+          <span>Result</span>
+          <strong><span class="badge text-bg-${badgeClass}">${resultText}</span></strong>
+        </div>
+        <div class="storage-replay-preview">
+          <span>Response preview</span>
+          <pre>${escapeHtml(preview)}</pre>
+        </div>
+        <p>${escapeHtml(explanation)}</p>
+      </div>
+    `;
+  }
+
+  async function callProfileWithToken(token, explanation) {
+    try {
+      const response = await fetch("/api/profile", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json"
+        }
+      });
+      const data = await response.json();
+
+      renderReplayResult({
+        statusCode: response.status,
+        granted: response.ok,
+        preview: responsePreview(data),
+        explanation
+      });
+    } catch (error) {
+      renderReplayResult({
+        statusCode: "Network error",
+        granted: false,
+        preview: error.message,
+        explanation: "The replay request could not be completed by the browser."
+      });
+    }
+  }
+
+  checkCookieButton.addEventListener("click", () => {
+    const readableCookies = document.cookie || "";
+    const hasReadableSessionCookie = readableCookies
+      .split(";")
+      .map((cookie) => cookie.trim())
+      .some((cookie) => cookie.startsWith("connect.sid="));
+
+    if (!readableCookies || !hasReadableSessionCookie) {
+      cookieResult.innerHTML = "No readable session cookie found. HttpOnly session cookies are not accessible from JavaScript.";
+      return;
+    }
+
+    cookieResult.innerHTML = `<code>${escapeHtml(readableCookies)}</code>`;
+  });
+
+  checkLocalStorageButton.addEventListener("click", () => {
+    const token = getJwtToken();
+
+    if (!token) {
+      jwtResult.innerHTML = "No JWT token found. Please log in using JWT first.";
+      updateReplayTokenState();
+      return;
+    }
+
+    jwtResult.innerHTML = `
+      <div><strong>Token preview:</strong> <code>${escapeHtml(tokenPreview(token))}</code></div>
+      <div><strong>Token length:</strong> ${token.length} characters</div>
+    `;
+    updateReplayTokenState();
+  });
+
+  useCurrentJwtButton.addEventListener("click", async () => {
+    const token = getJwtToken();
+
+    updateReplayTokenState();
+
+    if (!token) {
+      renderReplayResult({
+        statusCode: "No request sent",
+        granted: false,
+        preview: "No JWT token found. Please log in using JWT first.",
+        explanation: "A valid replay demonstration needs the JWT stored by the login form."
+      });
+      return;
+    }
+
+    await callProfileWithToken(
+      token,
+      "The valid JWT was reused successfully because JWT authentication is stateless and the token remains valid until expiration."
+    );
+  });
+
+  useFakeJwtButton.addEventListener("click", async () => {
+    await callProfileWithToken(
+      "fake.fake.fake",
+      "The fake JWT was rejected because its signature is invalid."
+    );
+  });
+
+  clearJwtReplayButton.addEventListener("click", () => {
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("jwtUserEmail");
+    updateReplayTokenState("JWT token removed from client storage.");
+  });
+
+  updateReplayTokenState();
+});
+</script>
+
+<%- include("../partials/footer") %>
