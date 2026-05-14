@@ -4,6 +4,18 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const User = require("../models/User");
 
+function getGoogleCallbackURL() {
+  if (process.env.GOOGLE_CALLBACK_URL) {
+    return process.env.GOOGLE_CALLBACK_URL;
+  }
+
+  if (process.env.APP_BASE_URL) {
+    return `${process.env.APP_BASE_URL.replace(/\/$/, "")}/auth/google/callback`;
+  }
+
+  return "/auth/google/callback";
+}
+
 function configurePassport(passport) {
   passport.use(
     "local",
@@ -41,7 +53,8 @@ function configurePassport(passport) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID || "missing-google-client-id",
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || "missing-google-client-secret",
-        callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/auth/google/callback"
+        callbackURL: getGoogleCallbackURL(),
+        proxy: true
       },
       async (accessToken, refreshToken, profile, done) => {
         try {

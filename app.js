@@ -18,6 +18,7 @@ const metricsMiddleware = require("./middleware/metricsMiddleware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === "production";
 
 function parseCookies(cookieHeader = "") {
   return cookieHeader.split(";").reduce((cookies, part) => {
@@ -38,6 +39,7 @@ app.set("passport", passport);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("trust proxy", 1);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -53,7 +55,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: isProduction,
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60
     }
   })
